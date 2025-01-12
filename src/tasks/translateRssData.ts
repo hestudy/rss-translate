@@ -1,4 +1,6 @@
+import { translate } from '@/utils/translate'
 import { TaskConfig } from 'payload'
+import Parser from 'rss-parser'
 
 export const translateRssData: TaskConfig<'translateRssData'> = {
   slug: 'translateRssData',
@@ -17,7 +19,20 @@ export const translateRssData: TaskConfig<'translateRssData'> = {
     })
 
     for await (const rssDataItem of rssData.docs) {
-      console.log(rssDataItem.id)
+      const data = rssDataItem.data as Parser.Item
+      const title = await translate(data.title)
+      const content = await translate(data.content)
+      await req.payload.create({
+        collection: 'rssTranslate',
+        data: {
+          data: {
+            ...data,
+            title,
+            content,
+          },
+          rssData: rssDataItem.id,
+        },
+      })
     }
 
     return {
