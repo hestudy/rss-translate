@@ -1,9 +1,11 @@
+import { logger } from '@/utils/logger'
 import { TaskConfig } from 'payload'
 import Parser from 'rss-parser'
 
 export const saveRssData: TaskConfig<'saveRssData'> = {
   slug: 'saveRssData',
   handler: async ({ req }) => {
+    logger.info('saveRssData task started')
     const rss = await req.payload.find({
       collection: 'rss',
     })
@@ -28,6 +30,7 @@ export const saveRssData: TaskConfig<'saveRssData'> = {
           })
 
           if (countRes.totalDocs === 0) {
+            logger.info(`Creating new rssData item: ${rssDataItem.link}`)
             await req.payload.create({
               collection: 'rssData',
               data: {
@@ -35,11 +38,12 @@ export const saveRssData: TaskConfig<'saveRssData'> = {
                 rss: rssItem.id,
               },
             })
+            logger.info(`Created new rssData item: ${rssDataItem.link}`)
           }
         }
       }
     }
-
+    logger.info('saveRssData task finished')
     return {
       output: {},
     }

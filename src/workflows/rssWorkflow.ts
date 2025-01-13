@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger'
 import { WorkflowConfig } from 'payload'
 
 export const rssWorkflow: WorkflowConfig<'rssWorkflow'> = {
@@ -13,6 +14,7 @@ export const rssWorkflow: WorkflowConfig<'rssWorkflow'> = {
     },
   ],
   handler: async ({ req, tasks }) => {
+    logger.info('Starting rssWorkflow')
     const rss = await req.payload.find({
       collection: 'rss',
     })
@@ -30,5 +32,6 @@ export const rssWorkflow: WorkflowConfig<'rssWorkflow'> = {
     await tasks.translateRssData('3', {
       input: {},
     })
+    logger.info('Finished rssWorkflow')
   },
 }

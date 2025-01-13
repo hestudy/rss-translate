@@ -13,7 +13,8 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test:translate": "tsx --no-warnings --env-file=.env test/translate.test.ts"
+    "test:translate": "tsx --no-warnings --env-file=.env test/translate.test.ts",
+    "test:getNotTranslateData": "tsx --no-warnings --env-file=.env test/getNotTranslateData.test.ts"
   },
   "dependencies": {
     "@langchain/core": "^0.3.29",
@@ -28,6 +29,8 @@
     "langchain": "^0.3.11",
     "next": "15.1.0",
     "payload": "latest",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "rss-parser": "^3.13.0",
