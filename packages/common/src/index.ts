@@ -8,3 +8,5 @@ export const beautifyDomByUrl = async (url: string) => {
   const reader = new Readability(dom.window.document);
   return reader.parse();
 };
+
+export const translate = async (html: string) => {};

@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { beautifyDomByUrl, squared } from '../src/index';
+import { beautifyDomByUrl, squared, translate } from '../src/index';
 
 test('squared', () => {
   expect(squared(2)).toBe(4);
@@ -12,3 +12,5 @@ test('beautifyDomByUrl', async () => {
   );
   expect(result).toBeTruthy();
 });
+
+test('translate', async () => {});

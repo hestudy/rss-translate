@@ -30,6 +30,7 @@
   "private": true,
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
+    "domtranslator": "^1.3.1",
     "jsdom": "^26.1.0"
   }
 }
