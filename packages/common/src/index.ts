@@ -61,6 +61,9 @@ export const translate = async (
             ],
           });
           if (completion.choices[0].message.content) {
+            console.log(
+              `Translation: ${completion.choices[0].message.content}`,
+            );
             edits.push(textNode.replace(completion.choices[0].message.content));
           }
         }
