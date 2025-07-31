@@ -19,6 +19,7 @@ export const translate = async (
   openai: OpenAI,
   model = 'gpt-4',
   targetLang = 'chinese simplified',
+  chunkCount = 10,
 ) => {
   const langDetact = new LanguageDetect();
   const ast = parse(Lang.Html, html);
@@ -34,7 +35,7 @@ export const translate = async (
 
   const edits: Edit[] = [];
 
-  const textNodeListChunks = chunk(textNodeList, 2);
+  const textNodeListChunks = chunk(textNodeList, chunkCount);
 
   for (let i = 0; i < textNodeListChunks.length; i++) {
     console.log(`Translating ${i + 1} of ${textNodeListChunks.length}...`);
