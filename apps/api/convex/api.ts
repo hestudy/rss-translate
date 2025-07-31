@@ -21,14 +21,50 @@ export const parserRss = internalAction({
 export const saveRss = internalMutation({
   args: {
     feedId: v.id("feeds"),
-    feed: v.any(),
+    feed: v.object({
+      title: v.optional(v.string()),
+      description: v.optional(v.string()),
+      link: v.optional(v.string()),
+      items: v.array(v.any()),
+    }),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.patch(args.feedId, {
+    await ctx.db.patch(args.feedId, {
       title: args.feed.title,
       description: args.feed.description,
       link: args.feed.link,
     });
+
+    return await Promise.all(
+      args.feed.items.map(async (item) => {
+        const existingItem = await ctx.db
+          .query("feedItems")
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("feed"), args.feedId),
+              q.eq(q.field("guid"), item.guid)
+            )
+          )
+          .first();
+
+        if (existingItem) {
+          return;
+        }
+
+        return await ctx.db.insert("feedItems", {
+          feed: args.feedId,
+          title: item.title,
+          link: item.link,
+          pubDate: item.pubDate,
+          creator: item.creator,
+          content: item.content,
+          contentSnippet: item.contentSnippet,
+          guid: item.guid,
+          category: item.category,
+          isoDate: item.isoDate,
+        });
+      })
+    );
   },
 });
 
@@ -43,7 +79,12 @@ export const scrapyFeedWorkflow = workflow.define({
     });
     await step.runMutation(internal.api.saveRss, {
       feedId: args.feedId,
-      feed,
+      feed: {
+        title: feed.title,
+        description: feed.description,
+        link: feed.link,
+        items: feed.items,
+      },
     });
   },
 });
