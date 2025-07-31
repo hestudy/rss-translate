@@ -8,7 +8,9 @@
  * @module
  */
 
+import type * as api_ from "../api.js";
 import type * as auth from "../auth.js";
+import type * as feeds from "../feeds.js";
 import type * as http from "../http.js";
 import type * as index from "../index.js";
 
@@ -27,7 +29,9 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  api: typeof api_;
   auth: typeof auth;
+  feeds: typeof feeds;
   http: typeof http;
   index: typeof index;
 }>;

@@ -10,6 +10,8 @@ const schema = defineSchema({
     description: v.optional(v.string()),
     link: v.optional(v.string()),
     user: v.id("users"),
+    workflowId: v.optional(v.string()),
+    workpoolId: v.optional(v.string()),
   }),
   feedItems: defineTable({
     feed: v.id("feeds"),

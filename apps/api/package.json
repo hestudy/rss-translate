@@ -23,6 +23,7 @@
     "convex": "^1.25.4",
     "dotenv": "^17.2.1",
     "hono": "^4.8.10",
+    "rss-parser": "^3.13.0",
     "zod": "^4.0.14"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { showRoutes } from "hono/dev";
-import test from "./router/test.js";
+import api from "./router/api.js";
 import { cors } from "hono/cors";
 
 const app = new Hono()
@@ -14,7 +14,7 @@ const app = new Hono()
   .get("/", (c) => {
     return c.text("Hello Hono!");
   })
-  .route("/test", test);
+  .route("/api", api);
 
 showRoutes(app);
 
