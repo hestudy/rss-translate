@@ -25,12 +25,17 @@
     "@vitest/ui": "3.2.4",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3",
+    "vite": "^7.0.6",
     "vitest": "^3.2.4"
   },
   "private": true,
   "dependencies": {
+    "@ast-grep/napi": "^0.39.2",
     "@mozilla/readability": "^0.6.0",
     "domtranslator": "^1.3.1",
-    "jsdom": "^26.1.0"
+    "es-toolkit": "^1.39.8",
+    "jsdom": "^26.1.0",
+    "languagedetect": "^2.0.0",
+    "openai": "^5.11.0"
   }
 }
