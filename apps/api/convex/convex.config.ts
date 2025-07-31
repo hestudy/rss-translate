@@ -8,5 +8,11 @@ app.use(workflow);
 app.use(workpool, {
   name: "feedWorkpool",
 });
+app.use(workpool, {
+  name: "feedItemWorkpool",
+});
+app.use(workpool, {
+  name: "translateHtmlWorkpool",
+});
 app.use(crons);
 export default app;

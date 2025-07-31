@@ -10,6 +10,15 @@ export const workflow = new WorkflowManager(components.workflow);
 export const feedWorkpool = new Workpool(components.feedWorkpool, {
   maxParallelism: 10,
 });
+export const feedItemWorkpool = new Workpool(components.feedItemWorkpool, {
+  maxParallelism: 10,
+});
+export const translateHtmlWorkpool = new Workpool(
+  components.translateHtmlWorkpool,
+  {
+    maxParallelism: 1,
+  }
+);
 
 export const crons = new Crons(components.crons);
 

@@ -20,6 +20,8 @@ const schema = defineSchema({
     pubDate: v.optional(v.string()),
     creator: v.optional(v.string()),
     content: v.optional(v.string()),
+    scrapyContent: v.optional(v.string()),
+    translateContent: v.optional(v.string()),
     contentSnippet: v.optional(v.string()),
     guid: v.optional(v.string()),
     category: v.optional(v.array(v.string())),

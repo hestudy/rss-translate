@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { client, workflow } from ".";
+import { client, feedItemWorkpool, workflow } from ".";
 import { internal } from "./_generated/api";
 import { internalAction, internalMutation } from "./_generated/server";
 
@@ -51,7 +51,7 @@ export const saveRss = internalMutation({
           return;
         }
 
-        return await ctx.db.insert("feedItems", {
+        const itemId = await ctx.db.insert("feedItems", {
           feed: args.feedId,
           title: item.title,
           link: item.link,
@@ -63,6 +63,17 @@ export const saveRss = internalMutation({
           category: item.category,
           isoDate: item.isoDate,
         });
+
+        await feedItemWorkpool.enqueueAction(
+          ctx,
+          internal.feedItems.scrapyContent,
+          {
+            url: item.link,
+            itemId,
+          }
+        );
+
+        return itemId;
       })
     );
   },

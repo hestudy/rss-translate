@@ -14,12 +14,12 @@ export const beautifyDomByUrl = async (url: string) => {
   return reader.parse();
 };
 
-export const translate = async (
+export const translateHtml = async (
   html: string,
   openai: OpenAI,
   model = 'gpt-4',
   targetLang = 'chinese simplified',
-  chunkCount = 10,
+  chunkCount = 2,
 ) => {
   const langDetact = new LanguageDetect();
   const ast = parse(Lang.Html, html);
