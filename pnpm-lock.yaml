@@ -85,6 +85,37 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
+  apps/rss:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.18.0
+        version: 1.18.0(hono@4.8.10)
+      '@hono/zod-validator':
+        specifier: ^0.7.2
+        version: 0.7.2(hono@4.8.10)(zod@4.0.14)
+      api:
+        specifier: workspace:*
+        version: link:../api
+      convex:
+        specifier: ^1.25.4
+        version: 1.25.4(react@19.1.1)
+      hono:
+        specifier: ^4.8.10
+        version: 4.8.10
+      zod:
+        specifier: ^4.0.14
+        version: 4.0.14
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.17
+        version: 20.19.9
+      tsx:
+        specifier: ^4.7.1
+        version: 4.20.3
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
   apps/test:
     dependencies:
       '@tailwindcss/typography':
@@ -716,6 +747,12 @@ packages:
 
   '@hono/node-server@1.17.1':
     resolution: {integrity: sha512-SY79W/C+2b1MyAzmIcV32Q47vO1b5XwLRwj8S9N6Jr5n1QCkIfAIH6umOSgqWZ4/v67hg6qq8Ha5vZonVidGsg==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
+
+  '@hono/node-server@1.18.0':
+    resolution: {integrity: sha512-CJ0H3/ouk/JWnyiuYOJLdpuWhO2D2BTNigHaFixnW3CrwZb+E+4s/KoFkcikHXcVmXoxaLJx1nlGa3JChEFtFA==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -3076,6 +3113,10 @@ snapshots:
     optional: true
 
   '@hono/node-server@1.17.1(hono@4.8.10)':
+    dependencies:
+      hono: 4.8.10
+
+  '@hono/node-server@1.18.0(hono@4.8.10)':
     dependencies:
       hono: 4.8.10
 

@@ -2,7 +2,11 @@
   "name": "api",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./convex": {
+      "import": "./convex/_generated/api.js",
+      "types": "./convex/_generated/api.d.ts"
+    }
   },
   "scripts": {
     "dev": "npm-run-all -p dev:*",
