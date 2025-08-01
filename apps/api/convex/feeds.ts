@@ -39,6 +39,7 @@ export const create = mutation({
       {
         feedUrl: args.feedUrl,
         feedId,
+        userId,
       }
     );
 
@@ -47,5 +48,43 @@ export const create = mutation({
     });
 
     return feedId;
+  },
+});
+
+export const reScrapy = mutation({
+  args: {
+    feedId: v.id("feeds"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const feed = await ctx.db
+      .query("feeds")
+      .filter((q) =>
+        q.and(q.eq(q.field("_id"), args.feedId), q.eq(q.field("user"), userId))
+      )
+      .first();
+    if (!feed) {
+      throw new Error("Feed not found");
+    }
+
+    const workpoolId = await feedWorkpool.enqueueMutation(
+      ctx,
+      internal.api.startScrapyWorkflow,
+      {
+        feedUrl: feed.feedUrl,
+        feedId: args.feedId,
+        userId,
+      }
+    );
+
+    await ctx.db.patch(feed._id, {
+      workpoolId,
+    });
+
+    return feed._id;
   },
 });

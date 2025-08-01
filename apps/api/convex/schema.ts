@@ -1,6 +1,7 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { tr } from "zod/locales";
 
 const schema = defineSchema({
   ...authTables,
@@ -23,9 +24,11 @@ const schema = defineSchema({
     scrapyContent: v.optional(v.string()),
     translateContent: v.optional(v.string()),
     contentSnippet: v.optional(v.string()),
+    translateContentSnippet: v.optional(v.string()),
     guid: v.optional(v.string()),
     category: v.optional(v.array(v.string())),
     isoDate: v.optional(v.string()),
+    user: v.id("users"),
   }),
 });
 

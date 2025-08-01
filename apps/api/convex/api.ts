@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { client, feedItemWorkpool, workflow } from ".";
+import { client, feedItemWorkpool, translateTextWorkpool, workflow } from ".";
 import { internal } from "./_generated/api";
 import { internalAction, internalMutation } from "./_generated/server";
 
@@ -27,6 +27,7 @@ export const saveRss = internalMutation({
       link: v.optional(v.string()),
       items: v.array(v.any()),
     }),
+    userId: v.id("users"),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.feedId, {
@@ -62,6 +63,7 @@ export const saveRss = internalMutation({
           guid: item.guid,
           category: item.category,
           isoDate: item.isoDate,
+          user: args.userId,
         });
 
         await feedItemWorkpool.enqueueAction(
@@ -73,6 +75,17 @@ export const saveRss = internalMutation({
           }
         );
 
+        if (item.contentSnippet) {
+          await translateTextWorkpool.enqueueAction(
+            ctx,
+            internal.feedItems.translateTextContent,
+            {
+              itemId,
+              content: item.contentSnippet,
+            }
+          );
+        }
+
         return itemId;
       })
     );
@@ -83,6 +96,7 @@ export const scrapyFeedWorkflow = workflow.define({
   args: {
     feedUrl: v.string(),
     feedId: v.id("feeds"),
+    userId: v.id("users"),
   },
   handler: async (step, args) => {
     const feed = await step.runAction(internal.api.parserRss, {
@@ -96,6 +110,7 @@ export const scrapyFeedWorkflow = workflow.define({
         link: feed.link,
         items: feed.items,
       },
+      userId: args.userId,
     });
   },
 });
@@ -104,6 +119,7 @@ export const startScrapyWorkflow = internalMutation({
   args: {
     feedUrl: v.string(),
     feedId: v.id("feeds"),
+    userId: v.id("users"),
   },
   handler: async (ctx, args) => {
     const workflowId = await workflow.start(
@@ -112,6 +128,7 @@ export const startScrapyWorkflow = internalMutation({
       {
         feedUrl: args.feedUrl,
         feedId: args.feedId,
+        userId: args.userId,
       }
     );
     await ctx.db.patch(args.feedId, {

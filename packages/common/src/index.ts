@@ -17,7 +17,7 @@ export const beautifyDomByUrl = async (url: string) => {
 export const translateHtml = async (
   html: string,
   openai: OpenAI,
-  model = 'gpt-4',
+  model = 'gpt-4o-mini',
   targetLang = 'chinese simplified',
   chunkCount = 2,
 ) => {
@@ -47,25 +47,14 @@ export const translateHtml = async (
         const text = textNode.text();
         const langs = langDetact.detect(text, 1);
         if (!isEmpty(langs)) {
-          console.log(`Translating ${text}...`);
-          const completion = await openai.chat.completions.create({
+          const translated = await translateText(
+            text,
+            openai,
             model,
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a translator.',
-              },
-              {
-                role: 'user',
-                content: `Translate the following text to ${targetLang}: ${text}`,
-              },
-            ],
-          });
-          if (completion.choices[0].message.content) {
-            console.log(
-              `Translation: ${completion.choices[0].message.content}`,
-            );
-            edits.push(textNode.replace(completion.choices[0].message.content));
+            targetLang,
+          );
+          if (translated) {
+            edits.push(textNode.replace(translated));
           }
         }
       }),
@@ -73,4 +62,30 @@ export const translateHtml = async (
   }
 
   return root.commitEdits(edits);
+};
+
+export const translateText = async (
+  text: string,
+  openai: OpenAI,
+  model = 'gpt-4o-mini',
+  targetLang = 'chinese simplified',
+) => {
+  console.log(`Translating ${text}...`);
+  const completion = await openai.chat.completions.create({
+    model,
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a translator.',
+      },
+      {
+        role: 'user',
+        content: `Translate the following text to ${targetLang}: ${text}`,
+      },
+    ],
+  });
+  if (completion.choices[0].message.content) {
+    console.log(`Translation: ${completion.choices[0].message.content}`);
+    return completion.choices[0].message.content;
+  }
 };

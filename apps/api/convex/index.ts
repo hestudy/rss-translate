@@ -19,6 +19,12 @@ export const translateHtmlWorkpool = new Workpool(
     maxParallelism: 1,
   }
 );
+export const translateTextWorkpool = new Workpool(
+  components.translateTextWorkpool,
+  {
+    maxParallelism: 1,
+  }
+);
 
 export const crons = new Crons(components.crons);
 

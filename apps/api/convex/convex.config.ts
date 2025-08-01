@@ -14,5 +14,9 @@ app.use(workpool, {
 app.use(workpool, {
   name: "translateHtmlWorkpool",
 });
+app.use(workpool, {
+  name: "translateTextWorkpool",
+});
+
 app.use(crons);
 export default app;
