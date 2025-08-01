@@ -4,6 +4,8 @@ import { Hono } from "hono";
 import OpenAI from "openai";
 import Parser from "rss-parser";
 import z from "zod";
+import convexClient from "../lib/convexClient.js";
+import { api as convexApi } from "../../convex/_generated/api.js";
 
 const parser = new Parser();
 const openai = new OpenAI({
@@ -66,6 +68,21 @@ const api = new Hono()
       const body = c.req.valid("json");
       const result = await translateText(body.text, openai);
       return c.text(result ?? "");
+    }
+  )
+  .get(
+    "/rss",
+    zValidator(
+      "query",
+      z.object({
+        id: z.string(),
+      })
+    ),
+    async (c) => {
+      const query = c.req.valid("query");
+      const result = await convexClient.query(convexApi.feeds.rssData, {
+        feedId: query.id,
+      });
     }
   );
 

@@ -4,11 +4,14 @@ import { v } from "convex/values";
 import { client, feedWorkpool, workflow } from ".";
 import { internal } from "./_generated/api";
 import {
+  httpAction,
   internalAction,
   internalMutation,
+  internalQuery,
   mutation,
   query,
 } from "./_generated/server";
+import { Feed } from "feed";
 
 export const create = mutation({
   args: {
@@ -235,5 +238,22 @@ export const saveTranslateDescription = internalMutation({
     return await ctx.db.patch(args.feedId, {
       translateDescription: args.description,
     });
+  },
+});
+
+export const rssData = query({
+  args: {
+    feedId: v.id("feeds"),
+  },
+  handler: async (ctx, args) => {
+    const feed = await ctx.db.get(args.feedId);
+    const items = await ctx.db
+      .query("feedItems")
+      .filter((q) => q.eq(q.field("feed"), args.feedId))
+      .collect();
+    return {
+      ...feed,
+      items,
+    };
   },
 });

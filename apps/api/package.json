@@ -23,6 +23,7 @@
     "common": "workspace:*",
     "convex": "^1.25.4",
     "dotenv": "^17.2.1",
+    "feed": "^5.1.0",
     "hono": "^4.8.10",
     "openai": "^5.11.0",
     "rss-parser": "^3.13.0",
