@@ -2,7 +2,6 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api.js";
 import { internalAction, internalMutation } from "./_generated/server.js";
 import { client, translateHtmlWorkpool } from "./index.js";
-import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const saveScrapyContent = internalMutation({
   args: {
@@ -10,7 +9,17 @@ export const saveScrapyContent = internalMutation({
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.patch(args.itemId, {
+    const workpoolId = await translateHtmlWorkpool.enqueueAction(
+      ctx,
+      internal.feedItems.translateHtmlContent,
+      {
+        itemId: args.itemId,
+        content: args.content,
+      }
+    );
+
+    await ctx.db.patch(args.itemId, {
+      translateContentWorkpoolId: workpoolId,
       scrapyContent: args.content,
     });
   },
@@ -33,14 +42,6 @@ export const scrapyContent = internalAction({
         itemId: args.itemId,
         content: json.content,
       });
-      await translateHtmlWorkpool.enqueueAction(
-        ctx,
-        internal.feedItems.translateHtmlContent,
-        {
-          itemId: args.itemId,
-          content: json.content,
-        }
-      );
     }
   },
 });

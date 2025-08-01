@@ -66,7 +66,7 @@ export const saveRss = internalMutation({
           user: args.userId,
         });
 
-        await feedItemWorkpool.enqueueAction(
+        const workpoolId = await feedItemWorkpool.enqueueAction(
           ctx,
           internal.feedItems.scrapyContent,
           {
@@ -75,8 +75,12 @@ export const saveRss = internalMutation({
           }
         );
 
+        await ctx.db.patch(itemId, {
+          scrapyContentWorkpoolId: workpoolId,
+        });
+
         if (item.contentSnippet) {
-          await translateTextWorkpool.enqueueAction(
+          const translateWorkpoolId = await translateTextWorkpool.enqueueAction(
             ctx,
             internal.feedItems.translateTextContent,
             {
@@ -84,6 +88,10 @@ export const saveRss = internalMutation({
               content: item.contentSnippet,
             }
           );
+
+          await ctx.db.patch(itemId, {
+            translateContentSnippetWorkpoolId: translateWorkpoolId,
+          });
         }
 
         return itemId;

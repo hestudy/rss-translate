@@ -1,8 +1,9 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { feedWorkpool } from ".";
+import { feedWorkpool, workflow } from ".";
 import { internal } from "./_generated/api";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const create = mutation({
   args: {
@@ -86,5 +87,48 @@ export const reScrapy = mutation({
     });
 
     return feed._id;
+  },
+});
+
+export const page = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+    const feeds = await ctx.db
+      .query("feeds")
+      .filter((q) => q.eq(q.field("user"), userId))
+      .paginate(args.paginationOpts);
+
+    const feedsWithStatus = await Promise.all(
+      feeds.page.map(async (feed) => {
+        return {
+          ...feed,
+          workpoolStatus: feed.workflowId
+            ? await feedWorkpool.status(ctx, feed.workpoolId as any)
+            : null,
+          workflowStatus: feed.workflowId
+            ? await workflow.status(ctx, feed.workflowId as any)
+            : null,
+        };
+      })
+    );
+
+    const allFeeds = await ctx.db
+      .query("feeds")
+      .filter((q) => q.eq(q.field("user"), userId))
+      .collect();
+
+    return {
+      page: {
+        ...feeds,
+        page: feedsWithStatus,
+      },
+      total: allFeeds.length,
+    };
   },
 });
