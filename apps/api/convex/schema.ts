@@ -7,7 +7,11 @@ const schema = defineSchema({
   feeds: defineTable({
     feedUrl: v.string(),
     title: v.optional(v.string()),
+    translateTitle: v.optional(v.string()),
+    translateTitleWorkpoolId: v.optional(v.string()),
     description: v.optional(v.string()),
+    translateDescription: v.optional(v.string()),
+    translateDescriptionWorkpoolId: v.optional(v.string()),
     link: v.optional(v.string()),
     user: v.id("users"),
     workflowId: v.optional(v.string()),

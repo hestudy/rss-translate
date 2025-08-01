@@ -36,6 +36,34 @@ export const saveRss = internalMutation({
       link: args.feed.link,
     });
 
+    if (args.feed.title) {
+      const workpoolId = await translateTextWorkpool.enqueueAction(
+        ctx,
+        internal.feeds.translateTitle,
+        {
+          feedId: args.feedId,
+          title: args.feed.title,
+        }
+      );
+      await ctx.db.patch(args.feedId, {
+        translateTitleWorkpoolId: workpoolId,
+      });
+    }
+
+    if (args.feed.description) {
+      const workpoolId = await translateTextWorkpool.enqueueAction(
+        ctx,
+        internal.feeds.translateDescription,
+        {
+          feedId: args.feedId,
+          description: args.feed.description,
+        }
+      );
+      await ctx.db.patch(args.feedId, {
+        translateDescriptionWorkpoolId: workpoolId,
+      });
+    }
+
     return await Promise.all(
       args.feed.items.map(async (item) => {
         const existingItem = await ctx.db

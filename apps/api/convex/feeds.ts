@@ -1,9 +1,14 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
-import { feedWorkpool, workflow } from ".";
+import { client, feedWorkpool, workflow } from ".";
 import { internal } from "./_generated/api";
-import { mutation, query } from "./_generated/server";
+import {
+  internalAction,
+  internalMutation,
+  mutation,
+  query,
+} from "./_generated/server";
 
 export const create = mutation({
   args: {
@@ -49,44 +54,6 @@ export const create = mutation({
     });
 
     return feedId;
-  },
-});
-
-export const reScrapy = mutation({
-  args: {
-    feedId: v.id("feeds"),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    const feed = await ctx.db
-      .query("feeds")
-      .filter((q) =>
-        q.and(q.eq(q.field("_id"), args.feedId), q.eq(q.field("user"), userId))
-      )
-      .first();
-    if (!feed) {
-      throw new Error("Feed not found");
-    }
-
-    const workpoolId = await feedWorkpool.enqueueMutation(
-      ctx,
-      internal.api.startScrapyWorkflow,
-      {
-        feedUrl: feed.feedUrl,
-        feedId: args.feedId,
-        userId,
-      }
-    );
-
-    await ctx.db.patch(feed._id, {
-      workpoolId,
-    });
-
-    return feed._id;
   },
 });
 
@@ -201,6 +168,72 @@ export const update = mutation({
     return await ctx.db.patch(args.feedId, {
       title: args.title,
       description: args.description,
+    });
+  },
+});
+
+export const translateTitle = internalAction({
+  args: {
+    feedId: v.id("feeds"),
+    title: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const res = await client.api.translateText.$post({
+      json: {
+        text: args.title,
+      },
+    });
+    const text = await res.text();
+    if (text) {
+      await ctx.runMutation(internal.feeds.saveTranslateTitle, {
+        feedId: args.feedId,
+        title: text,
+      });
+    }
+  },
+});
+
+export const saveTranslateTitle = internalMutation({
+  args: {
+    feedId: v.id("feeds"),
+    title: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args.feedId, {
+      translateTitle: args.title,
+    });
+  },
+});
+
+export const translateDescription = internalAction({
+  args: {
+    feedId: v.id("feeds"),
+    description: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const res = await client.api.translateText.$post({
+      json: {
+        text: args.description,
+      },
+    });
+    const text = await res.text();
+    if (text) {
+      await ctx.runMutation(internal.feeds.saveTranslateDescription, {
+        feedId: args.feedId,
+        description: text,
+      });
+    }
+  },
+});
+
+export const saveTranslateDescription = internalMutation({
+  args: {
+    feedId: v.id("feeds"),
+    description: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args.feedId, {
+      translateDescription: args.description,
     });
   },
 });
