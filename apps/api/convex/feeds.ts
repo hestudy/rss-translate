@@ -4,14 +4,11 @@ import { v } from "convex/values";
 import { client, feedWorkpool, workflow } from ".";
 import { internal } from "./_generated/api";
 import {
-  httpAction,
   internalAction,
   internalMutation,
-  internalQuery,
   mutation,
   query,
 } from "./_generated/server";
-import { Feed } from "feed";
 
 export const create = mutation({
   args: {
