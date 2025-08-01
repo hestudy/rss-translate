@@ -118,17 +118,89 @@ export const page = query({
       })
     );
 
-    const allFeeds = await ctx.db
-      .query("feeds")
-      .filter((q) => q.eq(q.field("user"), userId))
-      .collect();
-
     return {
-      page: {
-        ...feeds,
-        page: feedsWithStatus,
-      },
-      total: allFeeds.length,
+      ...feeds,
+      page: feedsWithStatus,
     };
+  },
+});
+
+export const read = query({
+  args: {
+    feedId: v.id("feeds"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const feed = await ctx.db
+      .query("feeds")
+      .filter((q) =>
+        q.and(q.eq(q.field("_id"), args.feedId), q.eq(q.field("user"), userId))
+      )
+      .first();
+
+    if (!feed) {
+      throw new Error("Feed not found");
+    }
+
+    return feed;
+  },
+});
+
+export const deleteFeed = mutation({
+  args: {
+    feedId: v.id("feeds"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const feed = await ctx.db
+      .query("feeds")
+      .filter((q) =>
+        q.and(q.eq(q.field("_id"), args.feedId), q.eq(q.field("user"), userId))
+      )
+      .first();
+
+    if (!feed) {
+      throw new Error("Feed not found");
+    }
+
+    return await ctx.db.delete(args.feedId);
+  },
+});
+
+export const update = mutation({
+  args: {
+    feedId: v.id("feeds"),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const feed = await ctx.db
+      .query("feeds")
+      .filter((q) =>
+        q.and(q.eq(q.field("_id"), args.feedId), q.eq(q.field("user"), userId))
+      )
+      .first();
+
+    if (!feed) {
+      throw new Error("Feed not found");
+    }
+
+    return await ctx.db.patch(args.feedId, {
+      title: args.title,
+      description: args.description,
+    });
   },
 });

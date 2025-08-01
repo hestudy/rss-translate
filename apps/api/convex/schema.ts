@@ -1,7 +1,6 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { tr } from "zod/locales";
 
 const schema = defineSchema({
   ...authTables,
@@ -32,6 +31,7 @@ const schema = defineSchema({
     category: v.optional(v.array(v.string())),
     isoDate: v.optional(v.string()),
     user: v.id("users"),
+    isRead: v.optional(v.boolean()),
   }),
 });
 
